@@ -10,8 +10,18 @@ public class GameManager : MonoBehaviour
     private float score = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public static GameManager Instance { get; private set; }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         GameState("Start");
     }
 

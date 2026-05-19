@@ -8,13 +8,11 @@ public class Cube : MonoBehaviour
     public CubePlacement spawner; // Reference to the spawner
 
     private GameObject parent;
-    [SerializeField] GameObject gameManager;
     [SerializeField] AudioSource place;
 
     void Start()
     {
         parent = GameObject.Find("Spawner");
-        gameManager = GameObject.Find("GameManager");
        //gameObject.GetComponent<Renderer>().material = parent.GetComponent<Renderer>().material;
         spawner = parent.GetComponent<CubePlacement>(); // Get the CubePlacement component from the parent
         // spawner is set by CubePlacement when instantiated
@@ -30,9 +28,9 @@ public class Cube : MonoBehaviour
                 spawner.OnCubeFellOff(this);
             }
            
-            if (isLastPlaced && gameManager != null)
+            if (isLastPlaced && GameManager.Instance != null)
             {
-                gameManager.GetComponent<GameManager>().GameState("End");
+                GameManager.Instance.GetComponent<GameManager>().GameState("End");
             }
         }
     }
@@ -41,9 +39,9 @@ public class Cube : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Cube"))
         {
-            if (isLastPlaced && gameManager != null && spawner != null)
+            if (isLastPlaced && GameManager.Instance != null && spawner != null)
             {
-                gameManager.GetComponent<GameManager>().AddScore(1);
+                GameManager.Instance.AddScore(1);
 
                 // Increment stacked count
                
