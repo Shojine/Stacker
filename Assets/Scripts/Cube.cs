@@ -25,12 +25,8 @@ public class Cube : MonoBehaviour
             Debug.Log("Cube entered bounds trigger: " + other.gameObject.name);
             if (isLastPlaced && spawner != null)
             {
+                // Notify the spawner (the subject); it will notify GameManager via the observer pattern.
                 spawner.OnCubeFellOff(this);
-            }
-           
-            if (isLastPlaced && GameManager.Instance != null)
-            {
-                GameManager.Instance.GetComponent<GameManager>().GameState("End");
             }
         }
     }
@@ -40,11 +36,8 @@ public class Cube : MonoBehaviour
         if (collision.gameObject.CompareTag("Cube"))
         {
             if (isLastPlaced && GameManager.Instance != null && spawner != null)
-            {
-                GameManager.Instance.AddScore(1);
-
-                // Increment stacked count
-               
+            {                // Increment stacked count
+                GameManager.Instance.AddScore(score); // Add to the score (scoring is owned by GameManager)
                 if(!place.isPlaying)
                 {
                     place.Play(); // Play the placement sound

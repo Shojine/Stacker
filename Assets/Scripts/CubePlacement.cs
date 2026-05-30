@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CubePlacement : MonoBehaviour
+public class CubePlacement : MonoBehaviour, ICubeSubject
 {
     [SerializeField] GameObject cubePrefab;
     [SerializeField] List<Material> materials = new List<Material>();
@@ -14,7 +14,7 @@ public class CubePlacement : MonoBehaviour
     private float stackTolerance = 0.5f;
     public float cubeHeight = 1f; // Set this to your cube's actual height
     public int fallOffCount = 0;
-
+    private List<ICubeObserver> cubeObservers = new List<ICubeObserver>();
     void Start()
     {
         // Set a random initial color for the spawner
@@ -84,6 +84,30 @@ public class CubePlacement : MonoBehaviour
         }
     }
 
+    public void Subscribe(ICubeObserver observer)
+    {
+        if(!cubeObservers.Contains(observer))
+        {
+            cubeObservers.Add(observer); // Add observer to the list if not already subscribed
+        }
+    }
+
+    public void Unsubscribe(ICubeObserver observer)
+    {
+        if(cubeObservers.Contains(observer))
+        {
+            cubeObservers.Remove(observer); // Remove observer from the list if subscribed
+        }
+    }
+
+    private void OnEventNotify(Cube cube)
+    {
+        foreach (var observer in cubeObservers)
+        {
+            observer.OnCubeFellOff(cube);
+        }
+    }
+
     private bool IsCubeStackedCorrectly(GameObject current, GameObject previous)
     {
         if (previous == null) return true;
@@ -103,5 +127,6 @@ public class CubePlacement : MonoBehaviour
         fallOffCount++;
         Debug.Log("Cube fell off! Total fallen: " + fallOffCount);
         // Add additional logic here if needed (e.g., end game, reduce score, etc.)
+        OnEventNotify(cube); // Notify observers that a cube has fallen off
     }
 }

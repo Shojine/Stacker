@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, ICubeObserver
 {
     [SerializeField] GameObject spawner;
     [SerializeField] TMP_Text scoreText; // Reference to the UI text component for displaying the score
@@ -15,13 +15,13 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        OnGameBegin(); // Subscribe to game events
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
         Instance = this;
-
         GameState("Start");
     }
 
@@ -33,6 +33,25 @@ public class GameManager : MonoBehaviour
     public void AddScore(float points)
     {
         score += points; // Increment the score by the specified points
+    }
+
+    private void OnDestroy()
+    {
+        OnGameEnd();
+    }
+
+    private void OnGameBegin()
+    {
+        spawner.GetComponent<CubePlacement>().Subscribe(this); // GameManager IS the observer
+    }
+    private void OnGameEnd()
+    {
+        spawner.GetComponent<CubePlacement>().Unsubscribe(this); // unsubscribe the same instance
+    }
+
+    public void OnCubeFellOff(Cube cube)
+    {
+        GameState("End"); // End the game when a cube falls off
     }
 
     public void GameState(string state)
@@ -51,6 +70,6 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning("Unknown game state: " + state);
                 break;
         }
-
     }
+
 }
