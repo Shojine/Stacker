@@ -1,4 +1,3 @@
-// Observer-role interfaces: implemented by classes that REACT to events.
 public interface IGameObserver
 {
     void OnGameEnd();

@@ -1,4 +1,3 @@
-// Subject-role interfaces: implemented by classes that PUBLISH events to observers.
 public interface IGameSubject
 {
     void Subscribe(IGameObserver observer);

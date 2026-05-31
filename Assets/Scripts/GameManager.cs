@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour, ICubeObserver, IGameController
     {
         scoreText.text = "Score: " + score.ToString(); // Update the score text in the UI
     }
+   
     void IGameController.AddScore(float points)
     {
         score += points; // Increment the score by the specified points
