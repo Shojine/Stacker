@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour, ICubeObserver
+public class GameManager : MonoBehaviour, ICubeObserver, IGameController
 {
     [SerializeField] GameObject spawner;
     [SerializeField] TMP_Text scoreText; // Reference to the UI text component for displaying the score
@@ -12,16 +12,21 @@ public class GameManager : MonoBehaviour, ICubeObserver
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public static GameManager Instance { get; private set; }
 
+    // The protection proxy every game-control request must go through.
+    public IGameController Controller { get; private set; }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        OnGameBegin(); // Subscribe to game events
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
         Instance = this;
+        Controller = new GameControllerProxy(this); // proxy wraps the real controller (this)
+
+        OnGameBegin(); // Subscribe to cube events
         GameState("Start");
     }
 
@@ -30,9 +35,14 @@ public class GameManager : MonoBehaviour, ICubeObserver
     {
         scoreText.text = "Score: " + score.ToString(); // Update the score text in the UI
     }
-    public void AddScore(float points)
+    void IGameController.AddScore(float points)
     {
         score += points; // Increment the score by the specified points
+    }
+
+    void IGameController.EndGame()
+    {
+        GameState("End");
     }
 
     private void OnDestroy()
@@ -51,7 +61,7 @@ public class GameManager : MonoBehaviour, ICubeObserver
 
     public void OnCubeFellOff(Cube cube)
     {
-        GameState("End"); // End the game when a cube falls off
+        Controller.EndGame(); // route through the proxy (dedupes + logs) instead of calling GameState directly
     }
 
     public void GameState(string state)

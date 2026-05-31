@@ -37,7 +37,7 @@ public class Cube : MonoBehaviour
         {
             if (isLastPlaced && GameManager.Instance != null && spawner != null)
             {                // Increment stacked count
-                GameManager.Instance.AddScore(score); // Add to the score (scoring is owned by GameManager)
+                GameManager.Instance.Controller.AddScore(score); // go through the protection proxy
                 if(!place.isPlaying)
                 {
                     place.Play(); // Play the placement sound
